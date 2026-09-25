@@ -1,7 +1,7 @@
 # ReNest Delivery, Communication & Final Presentation — Adriel Mounzón Baspineiro
 
-**Repositorio del proyecto:** [github.com/adrielmounzonravn/renest-pm](https://github.com/adrielmounzonravn/renest-pm)
-**Video demo:** [Ver en Google Drive](https://drive.google.com/file/d/101C2Fwn3lHLN2rXVRxHaciLzw01SJPIB/view?usp=sharing)
+**Project repository:** [github.com/adrielmounzonravn/renest-pm](https://github.com/adrielmounzonravn/renest-pm)
+**Demo video:** [Watch on Google Drive](https://drive.google.com/file/d/101C2Fwn3lHLN2rXVRxHaciLzw01SJPIB/view?usp=sharing)
 
 ## Context carried from Thursday
 - Confirmed MVP: Condition badge on the listing; minimum real photos required to publish; "doesn't match description" report.

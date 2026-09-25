@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ReNest — After (MVP)</title>
+<style>
+  :root{
+    --bg:#f4f1ec; --ink:#1f1d1a; --muted:#6b665e; --line:#e2ddd4;
+    --phone:#ffffff; --accent:#2f5d50; --good:#15803d; --good-soft:#ecf7ef;
+    --err:#b91c1c;
+    /* condition badges: dark text on tinted bg, WCAG AA */
+    --new-bg:#dbeafe; --new-fg:#1e3a8a;
+    --gc-bg:#dcfce7; --gc-fg:#14532d;
+    --vw-bg:#fef3c7; --vw-fg:#78350f;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif;padding:32px 16px 48px}
+  .wrap{max-width:1320px;margin:0 auto}
+  header{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-bottom:28px}
+  .tag{display:inline-block;background:var(--good);color:#fff;font-weight:700;font-size:13px;letter-spacing:.08em;padding:4px 10px;border-radius:4px;margin-bottom:10px}
+  h1{font-size:34px;line-height:1.15;max-width:760px}
+  .sub{color:var(--muted);margin-top:8px;max-width:760px;font-size:16px}
+  .mvp{background:#fff;border-radius:10px;padding:14px 18px;max-width:380px;font-size:14px;line-height:1.6}
+  .mvp h4{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+  .mvp .star{color:var(--good);font-weight:800}
+  .nav{font-size:13px;color:var(--muted);margin-bottom:18px}
+  .nav a{color:var(--accent)}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:28px}
+  .col h2{font-size:14px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:10px}
+  .col h2 span{color:var(--ink)}
+  .phone{background:var(--phone);border:10px solid #1f1d1a;border-radius:34px;height:600px;overflow:hidden;position:relative;display:flex;flex-direction:column}
+  .bar{padding:14px 16px 10px;border-bottom:1px solid var(--line);font-weight:700;font-size:15px;display:flex;justify-content:space-between;align-items:center}
+  .bar small{font-weight:500;color:var(--muted);font-size:12px}
+  .screen{padding:12px;flex:1;overflow:hidden;font-size:13px}
+
+  .badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;border-radius:6px;padding:2px 7px;line-height:1.4}
+  .badge.new{background:var(--new-bg);color:var(--new-fg)}
+  .badge.gc{background:var(--gc-bg);color:var(--gc-fg)}
+  .badge.vw{background:var(--vw-bg);color:var(--vw-fg)}
+  .badge.lg{font-size:13px;padding:4px 10px}
+
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .card{border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .ph{height:86px;display:flex;align-items:center;justify-content:center;position:relative}
+  .ph svg{width:62%}
+  .ph .badge{position:absolute;left:6px;top:6px}
+  .card .info{padding:7px 8px}
+  .price{font-weight:800;font-size:14px}
+  .ttl{font-size:12px;margin-top:1px}
+  .dist{color:var(--muted);font-size:11px;margin-top:2px}
+  .pill{display:inline-block;font-size:10px;border:1px solid var(--line);border-radius:20px;padding:1px 7px;color:var(--muted);margin-top:4px}
+
+  .hero{height:150px;border-radius:10px;display:flex;align-items:center;justify-content:center;position:relative}
+  .hero svg{width:55%}
+  .count{position:absolute;right:8px;bottom:8px;background:rgba(0,0,0,.6);color:#fff;font-size:11px;padding:2px 8px;border-radius:10px}
+  .thumbs{display:flex;gap:6px;margin-top:6px}
+  .thumbs div{flex:1;height:34px;border-radius:6px;background:#e9dccb;display:flex;align-items:center;justify-content:center;font-size:9px;color:#7a6a55;font-weight:600}
+  .thumbs div.on{outline:2px solid var(--accent)}
+  .row{display:flex;align-items:center;justify-content:space-between;margin-top:10px}
+  .big{font-size:22px;font-weight:800}
+  .cond{background:#fbf6ea;border-radius:8px;padding:8px 10px;margin-top:8px;font-size:12px;color:#5b4a2e;line-height:1.4}
+  .btn{display:block;width:100%;text-align:center;background:var(--accent);color:#fff;border-radius:10px;padding:11px;font-weight:700;margin-top:10px}
+  .btn.off{background:#d6d1c8;color:#8d877c}
+  .btn.warn{background:#fff;color:var(--err);border:1.5px solid var(--err)}
+
+  label{display:block;font-size:11px;font-weight:700;color:var(--muted);margin:8px 0 4px;text-transform:uppercase;letter-spacing:.04em}
+  label .req{color:var(--err)}
+  .photos{display:flex;gap:6px}
+  .slot{width:48px;height:48px;border-radius:8px;border:1.5px dashed #c9c2b6;display:flex;align-items:center;justify-content:center;color:#b3ab9e;font-size:18px}
+  .slot.full{border:none;background:#e9dccb}
+  .slot.full svg{width:70%}
+  .slot.need{border-color:var(--err);color:var(--err)}
+  .err{color:var(--err);font-size:11px;font-weight:600;margin-top:4px}
+  .opts{border:2px solid var(--err);border-radius:8px;overflow:hidden;background:#fff}
+  .opt{display:flex;gap:8px;align-items:flex-start;padding:7px 9px;border-bottom:1px solid var(--line)}
+  .opt:last-child{border-bottom:none}
+  .radio{width:14px;height:14px;border-radius:50%;border:1.5px solid #a39c90;flex:none;margin-top:2px}
+  .opt small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
+
+  .order{border:1px solid var(--line);border-radius:10px;padding:10px;display:flex;gap:10px;align-items:center}
+  .mini{width:50px;height:50px;border-radius:8px;background:#e9dccb;display:flex;align-items:center;justify-content:center}
+  .mini svg{width:75%}
+  .ok{color:var(--good);font-weight:700;font-size:12px}
+  .sheet{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:10px;box-shadow:0 6px 20px rgba(0,0,0,.06)}
+  .sheet h5{font-size:13px;margin-bottom:2px}
+  .sheet p{color:var(--muted);font-size:11px;margin-bottom:6px}
+  .reason{display:flex;gap:8px;align-items:center;padding:6px 0;border-top:1px solid var(--line);font-size:12px}
+  .radio.sel{border:4px solid var(--accent)}
+
+  .callout{background:var(--good-soft);border:1px solid #b7e0c3;color:#14532d;border-radius:10px;padding:10px 12px;margin-top:10px;font-size:12.5px;line-height:1.4}
+  .callout b{color:var(--good)}
+  .mark{outline:2px dashed var(--good);outline-offset:3px;border-radius:8px}
+  .num{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:var(--good);color:#fff;font-size:11px;font-weight:800;margin-right:4px;vertical-align:1px}
+  .feat{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;background:var(--ink);color:#fff;border-radius:4px;padding:2px 6px;margin-left:6px;vertical-align:2px}
+
+  .outcome{margin-top:34px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+  .o{background:#fff;border-radius:12px;padding:16px;border-top:4px solid var(--good)}
+  .o h3{font-size:14px;margin-bottom:6px}
+  .o p{font-size:13px;color:var(--muted);line-height:1.45}
+  .o.ns{border-top-color:var(--ink)}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="sofa" viewBox="0 0 120 70">
+    <rect x="14" y="8" width="92" height="32" rx="8" fill="currentColor" opacity=".85"/>
+    <rect x="4" y="26" width="22" height="32" rx="7" fill="currentColor"/>
+    <rect x="94" y="26" width="22" height="32" rx="7" fill="currentColor"/>
+    <rect x="20" y="36" width="80" height="20" rx="5" fill="currentColor" opacity=".95"/>
+    <rect x="12" y="58" width="6" height="8" rx="2" fill="#3b3328"/>
+    <rect x="102" y="58" width="6" height="8" rx="2" fill="#3b3328"/>
+  </symbol>
+</svg>
+
+<div class="wrap">
+  <div class="nav"><a href="renest-before.html">← View Before</a> · After</div>
+  <header>
+    <div>
+      <span class="tag">AFTER · MVP</span>
+      <h1>Every listing tells buyers its real condition, before they reach out</h1>
+      <p class="sub">Three features that close the gap between the listing and the real item, and let us measure whether it worked.</p>
+    </div>
+    <div class="mvp">
+      <h4>Confirmed MVP</h4>
+      <div><span class="star">#1</span> Condition badge on the listing (RICE 24.3)</div>
+      <div><span class="star">#2</span> Minimum 3 real photos to publish (RICE 15.3)</div>
+      <div><span class="star">#3</span> "Doesn't match description" report (RICE 8.1)</div>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- 1. Feed -->
+    <div class="col">
+      <h2>1 · Buyer <span>browses the feed</span></h2>
+      <div class="phone">
+        <div class="bar">ReNest <small>Sofas · within 20 min</small></div>
+        <div class="screen">
+          <div class="cards">
+            <div class="card"><div class="ph" style="background:#efe6da;color:#8a6a4a"><svg><use href="#sofa"/></svg><span class="badge vw mark">◐ Visible wear</span></div><div class="info"><div class="price">$180</div><div class="ttl">Grey 3-seat sofa</div><div class="dist">4 km</div></div></div>
+            <div class="card"><div class="ph" style="background:#e4ebe6;color:#5f7f6e"><svg><use href="#sofa"/></svg><span class="badge gc mark">✓ Good condition</span></div><div class="info"><div class="price">$95</div><div class="ttl">Green loveseat</div><div class="dist">7 km</div><span class="pill">Free delivery</span></div></div>
+            <div class="card"><div class="ph" style="background:#ece4ec;color:#7a5f7a"><svg><use href="#sofa"/></svg><span class="badge new mark">★ New</span></div><div class="info"><div class="price">$240</div><div class="ttl">Velvet sofa</div><div class="dist">11 km</div></div></div>
+            <div class="card"><div class="ph" style="background:#e8e6df;color:#6f6a5c"><svg><use href="#sofa"/></svg><span class="badge gc mark">✓ Good condition</span></div><div class="info"><div class="price">$60</div><div class="ttl">Beige couch</div><div class="dist">3 km</div></div></div>
+          </div>
+          <div class="callout"><span class="num">1</span><b>Condition at a glance.</b><span class="feat">Badge</span><br>Every card shows the status the seller picked. Icon + text + color, so it doesn't rely on color alone (WCAG AA), and it looks nothing like the neutral "Free delivery" tag.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Detail -->
+    <div class="col">
+      <h2>2 · Buyer <span>opens a listing</span></h2>
+      <div class="phone">
+        <div class="bar">← Listing <small>♡</small></div>
+        <div class="screen">
+          <div class="hero" style="background:#efe6da;color:#8a6a4a"><svg><use href="#sofa"/></svg><span class="count">1 / 4</span></div>
+          <div class="thumbs mark"><div class="on">Front</div><div>Side</div><div>Armrest</div><div>Cushion</div></div>
+          <div class="row"><span class="big">$180</span><span class="badge vw lg mark">◐ Visible wear</span></div>
+          <div style="font-weight:700">Grey 3-seat sofa</div>
+          <div class="cond"><b>Visible wear:</b> usable, with marks you'll notice. Seller note: small scuff on left armrest (see photo 3).</div>
+          <div class="btn">Message seller</div>
+          <div class="callout"><span class="num">2</span><b>Sonia knows what she's getting.</b><span class="feat">Badge + Photos</span><br>Same badge next to price and photos, plus real angles of the item. She messages with confidence, or skips it without wasting a trip.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Publish (unhappy path) -->
+    <div class="col">
+      <h2>3 · Seller <span>tries to publish</span></h2>
+      <div class="phone">
+        <div class="bar">New listing <small>Cancel</small></div>
+        <div class="screen">
+          <label>Photos <span class="req">· min 3</span></label>
+          <div class="photos">
+            <div class="slot full"><svg style="color:#8a6a4a"><use href="#sofa"/></svg></div>
+            <div class="slot full"><svg style="color:#8a6a4a"><use href="#sofa"/></svg></div>
+            <div class="slot need">+</div>
+          </div>
+          <div class="err">Add 1 more photo to publish (2 / 3)</div>
+          <label>Condition <span class="req">* required</span></label>
+          <div class="opts">
+            <div class="opt"><span class="radio"></span><div><b>New</b><small>Unused, original packaging or tags</small></div></div>
+            <div class="opt"><span class="radio"></span><div><b>Good condition</b><small>Used, no stains, tears or broken parts</small></div></div>
+            <div class="opt"><span class="radio"></span><div><b>Visible wear</b><small>Works fine; has scuffs, fading or stains</small></div></div>
+          </div>
+          <div class="err">Pick a condition to publish</div>
+          <div class="btn off">Publish</div>
+          <div class="callout"><span class="num">3</span><b>Publishing is blocked until it's honest.</b><span class="feat">Badge + Photos</span><br>No status or fewer than 3 photos means no publish. Each option has an example, so sellers can't just pick the optimistic one.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Report -->
+    <div class="col">
+      <h2>4 · Buyer <span>after pickup</span></h2>
+      <div class="phone">
+        <div class="bar">Order #4821 <small>Done</small></div>
+        <div class="screen">
+          <div class="order"><div class="mini" style="color:#8a6a4a"><svg><use href="#sofa"/></svg></div><div><b>Grey 3-seat sofa</b><div class="ok">✓ Completed</div><span class="badge vw" style="margin-top:3px">◐ Visible wear</span></div></div>
+          <div class="btn warn mark">⚑ Doesn't match description?</div>
+          <div class="sheet">
+            <h5>What was different?</h5>
+            <p>Available for 48h after pickup</p>
+            <div class="reason"><span class="radio sel"></span>Condition worse than described</div>
+            <div class="reason"><span class="radio"></span>Wrong item</div>
+            <div class="reason"><span class="radio"></span>Missing parts</div>
+            <div class="btn" style="margin-top:6px;padding:8px">Submit report</div>
+          </div>
+          <div class="callout"><span class="num">4</span><b>Mismatches become data.</b><span class="feat">Report</span><br>Only from completed orders, with a required reason. It feeds the North Star within 24h, so we can tell if the badge and photos actually work.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="outcome">
+    <div class="o"><h3>No more wasted trips</h3><p>Sonia filters out items that don't fit her standard before she messages anyone.</p></div>
+    <div class="o"><h3>Buyers reach out again</h3><p>Supporting signal: % of buyers who message a seller after viewing a listing.</p></div>
+    <div class="o"><h3>Sellers still finish listings</h3><p>Guardrail: % of sellers who complete the publish flow after the new required steps.</p></div>
+    <div class="o ns"><h3>North Star is measurable</h3><p>Weekly completed purchases with no condition-related dispute or return, tracked through reports.</p></div>
+  </div>
+</div>
+</body>
+</html>

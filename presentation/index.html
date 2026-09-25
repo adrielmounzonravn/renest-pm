@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReNest · Week Recap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Big+Shoulders+Display:wght@800;900&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+/* ===========================================
+   FIXED 16:9 STAGE: MANDATORY BASE STYLES
+   Include this ENTIRE file in every presentation.
+   Slides are authored at 1920×1080 and scaled as a whole.
+   =========================================== */
+
+/* 1. Lock the browser viewport */
+html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    background: var(--stage-bg, #000);
+}
+
+/* 2. Full-window deck viewport */
+.deck-viewport {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    background: var(--stage-bg, #000);
+}
+
+/* 3. Fixed 16:9 design canvas.
+   JavaScript sets transform: translate(...) scale(...). */
+.deck-stage {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    transform-origin: 0 0;
+    background: var(--slide-bg, #fff);
+}
+
+/* 4. Slides stack inside the fixed stage.
+   Content must be laid out at 1920×1080, not reflowed per device. */
+.slide {
+    position: absolute;
+    inset: 0;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    display: block;
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    background: var(--slide-bg, #fff);
+}
+
+.slide.active,
+.slide.visible {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+    z-index: 1;
+}
+
+/* 5. Keep media inside authored slide bounds */
+img,
+video,
+canvas,
+svg {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+/* 6. Presentation chrome stays outside the slide design system */
+.deck-controls {
+    position: fixed;
+    left: 50%;
+    bottom: 22px;
+    transform: translateX(-50%);
+    z-index: 1000;
+}
+
+/* 7. Print one fixed-size slide per page */
+@media print {
+    html,
+    body {
+        width: 1920px;
+        height: auto;
+        overflow: visible;
+        background: #fff;
+    }
+
+    .deck-viewport {
+        position: static;
+        overflow: visible;
+        background: #fff;
+    }
+
+    .deck-stage {
+        position: static;
+        width: auto;
+        height: auto;
+        transform: none !important;
+        background: none;
+    }
+
+    .slide {
+        position: relative;
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        width: 1920px;
+        height: 1080px;
+        break-after: page;
+        page-break-after: always;
+    }
+
+    .slide:last-child {
+        break-after: auto;
+        page-break-after: auto;
+    }
+
+    .deck-controls {
+        display: none !important;
+    }
+}
+
+/* 8. Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.2s !important;
+    }
+}
+
+/* ===========================================
+   THEME TOKENS
+   Kraft paper + manila hang tags + rubber stamps.
+   Change these to re-skin the whole deck.
+   =========================================== */
+:root {
+  --stage-bg: #8f7250;
+  --slide-bg: #c4a37a;
+  --kraft: #c4a37a;
+  --kraft-dark: #a8865c;
+  --manila: #ecdcb2;
+  --manila-edge: #d9c393;
+  --ink: #26221f;
+  --ink-soft: rgba(38,34,31,0.62);
+  --stamp: #d8431e;       /* problems, "before", red flags */
+  --go: #2f5d50;          /* solutions, "after", GO */
+  --display: 'Anton', 'Big Shoulders Display', sans-serif;
+  --stampf: 'Big Shoulders Display', sans-serif;
+  --mono: 'Courier Prime', 'Courier New', monospace;
+  --noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --inkmask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -2.4 2.1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E");
+  --thunk: cubic-bezier(0.3, 0, 0.2, 1);
+  --shadow: drop-shadow(0 22px 26px rgba(60,38,15,0.35)) drop-shadow(0 3px 3px rgba(60,38,15,0.3));
+}
+
+* { box-sizing: border-box; }
+p, h1, h2, h3, ul { margin: 0; padding: 0; }
+ul { list-style: none; }
+
+/* ===========================================
+   SLIDE SURFACE — kraft paper with grain
+   =========================================== */
+.slide {
+  font-family: var(--mono); color: var(--ink);
+  background:
+    radial-gradient(ellipse 1400px 900px at 30% 40%, rgba(255,240,210,0.28), rgba(255,240,210,0) 70%),
+    radial-gradient(ellipse 900px 700px at 100% 100%, rgba(90,60,30,0.28), rgba(90,60,30,0) 70%),
+    repeating-linear-gradient(92deg, rgba(120,85,45,0.05) 0 2px, rgba(0,0,0,0) 2px 7px),
+    var(--kraft);
+}
+.grain { position: absolute; inset: 0; background-image: var(--noise); opacity: 0.35; mix-blend-mode: multiply; pointer-events: none; z-index: 50; }
+
+/* ===========================================
+   CHROME — corner labels on every slide
+   =========================================== */
+.chrome {
+  position: absolute; left: 110px; right: 110px; font-size: 24px; letter-spacing: 0.08em; text-transform: uppercase;
+  display: flex; justify-content: space-between; color: var(--ink);
+}
+.chrome.top { top: 60px; }
+.chrome.bot { bottom: 50px; }
+.chrome .soft { color: var(--ink-soft); }
+
+/* ===========================================
+   SECTION HEAD — kicker + big Anton heading
+   =========================================== */
+.head { position: absolute; left: 110px; top: 140px; right: 110px; }
+.kicker { font-size: 26px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; display: flex; gap: 20px; align-items: center; }
+.kicker::after { content: ""; flex: 1; border-bottom: 2px solid var(--ink); opacity: 0.35; }
+.h2 { margin-top: 18px; font-family: var(--display); font-weight: 400; font-size: 118px; line-height: 0.95; text-transform: uppercase; }
+.head.compact { top: 118px; }
+.head.compact .h2 { font-size: 76px; margin-top: 10px; }
+
+/* ===========================================
+   PAPER COMPONENTS
+   .htag  horizontal hang tag (hole on the left)
+   .vtag  vertical hang tag (hole on top)
+   .ticket plain manila card
+   Shadows sit on the *-wrap so clip-path doesn't eat them.
+   =========================================== */
+.wrap { position: absolute; filter: var(--shadow); }
+.paper {
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.22), rgba(255,255,255,0) 30%),
+    radial-gradient(ellipse 900px 500px at 60% 40%, rgba(255,250,230,0.35), rgba(255,250,230,0) 70%),
+    linear-gradient(0deg, rgba(160,120,60,0.12), rgba(160,120,60,0) 40%),
+    var(--manila);
+}
+.paper::after { content: ""; position: absolute; inset: 0; background-image: var(--noise); opacity: 0.2; mix-blend-mode: multiply; pointer-events: none; }
+.htag {
+  --n: 120px;
+  clip-path: polygon(var(--n) 0, 100% 0, 100% 100%, var(--n) 100%, 0 calc(100% - var(--n)), 0 var(--n));
+  -webkit-mask: radial-gradient(circle at 70px 50%, transparent 22px, #000 23px);
+          mask: radial-gradient(circle at 70px 50%, transparent 22px, #000 23px);
+}
+.vtag {
+  --n: 80px;
+  clip-path: polygon(0 var(--n), var(--n) 0, calc(100% - var(--n)) 0, 100% var(--n), 100% 100%, 0 100%);
+  -webkit-mask: radial-gradient(circle at 50% 58px, transparent 20px, #000 21px);
+          mask: radial-gradient(circle at 50% 58px, transparent 20px, #000 21px);
+}
+.grommet {
+  position: absolute; width: 66px; height: 66px; margin: -33px 0 0 -33px; border-radius: 50%;
+  background: radial-gradient(circle, transparent 22px, #b89a5e 23px, #e9d8a6 27px, #9d7f48 32px, transparent 33px);
+}
+.htag-g { left: 70px; top: 50%; }
+.vtag-g { left: 50%; top: 58px; }
+.ticket { border-radius: 6px; }
+.content { position: absolute; inset: 0; }
+
+/* ===========================================
+   STAMPS — ink-masked rubber stamps
+   =========================================== */
+.stamp {
+  position: absolute; font-family: var(--stampf); font-weight: 900; text-transform: uppercase; line-height: 1;
+  color: var(--ink); border: 7px solid currentColor; border-radius: 10px; padding: 16px 28px 12px;
+  box-shadow: inset 0 0 0 5px transparent, inset 0 0 0 8px currentColor;
+  transform: rotate(var(--r, 0deg));
+  -webkit-mask-image: var(--inkmask); mask-image: var(--inkmask);
+  -webkit-mask-size: 260px; mask-size: 260px;
+  mix-blend-mode: multiply; opacity: 0.9; white-space: nowrap;
+}
+.stamp small { display: block; font-family: var(--mono); font-weight: 700; font-size: 20px; letter-spacing: 0.18em; margin-bottom: 8px; }
+.stamp.red { color: var(--stamp); }
+.stamp.green { color: var(--go); }
+.stamp.inline { position: relative; display: inline-block; }
+
+/* Chips: small bordered keyword labels */
+.chip {
+  display: inline-block; font-family: var(--mono); font-weight: 700; font-size: 26px; letter-spacing: 0.06em; text-transform: uppercase;
+  border: 3px solid var(--ink); border-radius: 6px; padding: 8px 16px 6px; white-space: nowrap;
+}
+.chip.red { color: var(--stamp); border-color: var(--stamp); }
+.chip.green { color: var(--go); border-color: var(--go); }
+.chip.solid { background: var(--ink); color: var(--manila); }
+
+/* ===========================================
+   ANIMATIONS — replay every time a slide becomes .visible
+   Use class .rv (fade-up), .sw (swing in), .th (stamp thunk).
+   Per-element delay via style="--d: 600ms".
+   =========================================== */
+.slide.visible .rv { animation: fade 750ms ease-out var(--d, 0ms) both; }
+.slide.visible .sw { animation: swingIn 1200ms cubic-bezier(0.2, 0.9, 0.25, 1.15) var(--d, 0ms) both; }
+.slide.visible .th { animation: thunk 520ms var(--thunk) var(--d, 0ms) both; }
+.slide.visible .dr { animation: drop 900ms cubic-bezier(0.2, 0.9, 0.25, 1.1) var(--d, 0ms) both; }
+
+@keyframes fade { from { opacity: 0; transform: translateY(14px) rotate(var(--r, 0deg)); } to { opacity: 1; transform: rotate(var(--r, 0deg)); } }
+@keyframes swingIn {
+  0% { opacity: 0; transform: rotate(calc(var(--r, 0deg) - 12deg)) translateY(-60px); }
+  60% { opacity: 1; transform: rotate(calc(var(--r, 0deg) + 2deg)); }
+  100% { transform: rotate(var(--r, 0deg)); }
+}
+@keyframes thunk {
+  0% { opacity: 0; transform: scale(1.7) rotate(calc(var(--r, 0deg) + 9deg)); }
+  62% { opacity: 0.9; transform: scale(0.93) rotate(calc(var(--r, 0deg) - 1deg)); }
+  80% { transform: scale(1.02) rotate(var(--r, 0deg)); }
+  100% { opacity: 0.9; transform: scale(1) rotate(var(--r, 0deg)); }
+}
+@keyframes drop {
+  0% { opacity: 0; transform: translateY(-40px) rotate(calc(var(--r, 0deg) + 6deg)) scale(1.04); }
+  100% { opacity: 1; transform: rotate(var(--r, 0deg)); }
+}
+/* Static rotation for elements that also animate */
+[style*="--r"] { transform: rotate(var(--r)); }
+
+/* ===========================================
+   SLIDE 1 — COVER
+   =========================================== */
+.cover-tag { left: 110px; top: 220px; width: 1210px; height: 640px; --r: -2.5deg; transform-origin: 80px 320px; }
+.cover-tag .htag { --n: 150px; -webkit-mask: radial-gradient(circle at 84px 50%, transparent 25px, #000 26px); mask: radial-gradient(circle at 84px 50%, transparent 25px, #000 26px); }
+.cover-tag .grommet { left: 84px; width: 76px; height: 76px; margin: -38px 0 0 -38px; background: radial-gradient(circle, transparent 25px, #b89a5e 26px, #e9d8a6 31px, #9d7f48 37px, transparent 38px); }
+.perf { position: absolute; left: 190px; top: 34px; bottom: 34px; border-left: 3px dashed rgba(38,34,31,0.28); }
+.cover-body { position: absolute; left: 250px; top: 104px; right: 70px; }
+.cover-title { margin-top: 34px; font-family: var(--display); font-weight: 400; font-size: 156px; line-height: 0.92; text-transform: uppercase; white-space: nowrap; }
+.cover-title span { display: block; }
+.cover-sub { margin-top: 40px; font-size: 32px; line-height: 1.35; }
+.cover-sub::before { content: "— "; }
+.string { max-width: none; max-height: none; position: absolute; left: -520px; top: -520px; width: 700px; height: 900px; overflow: visible; pointer-events: none; }
+.string path { fill: none; stroke: #f3ecdc; stroke-width: 5; stroke-linecap: round; filter: drop-shadow(0 3px 2px rgba(60,38,15,0.35)); }
+.cover-stamps { position: absolute; left: 1360px; top: 230px; width: 460px; height: 640px; }
+.cover-stamps .s1 { --r: -8deg; left: 40px; top: 0; font-size: 110px; letter-spacing: 0.06em; }
+.cover-stamps .s2 { --r: 5deg; left: 150px; top: 205px; font-size: 104px; letter-spacing: 0.04em; }
+.cover-stamps .s3 { --r: -4deg; left: 0; top: 420px; font-size: 84px; letter-spacing: 0.02em; }
+
+/* ===========================================
+   SLIDE 2 — PROBLEM (polaroids + quote)
+   =========================================== */
+.polaroid { position: absolute; width: 420px; height: 500px; background: #f7f1e3; padding: 26px 26px 0; filter: var(--shadow); }
+.polaroid .photo { width: 368px; height: 340px; overflow: hidden; }
+.polaroid .photo svg { width: 100%; height: 100%; display: block; max-width: none; max-height: none; }
+.polaroid .cap { font-family: var(--mono); font-weight: 700; font-size: 30px; letter-spacing: 0.1em; text-transform: uppercase; text-align: center; padding-top: 34px; }
+.tape { position: absolute; width: 150px; height: 44px; background: rgba(240,230,200,0.7); top: -18px; left: 50%; margin-left: -75px; transform: rotate(-4deg); box-shadow: 0 2px 4px rgba(0,0,0,0.12); }
+.pol-a { left: 110px; top: 370px; --r: -5deg; }
+.pol-b { left: 500px; top: 400px; --r: 4deg; }
+.neq { left: 800px; top: 310px; font-size: 110px; padding: 6px 30px 0; --r: -10deg; z-index: 5; }
+.quote-card { left: 1030px; top: 360px; width: 780px; height: 400px; --r: 1.5deg; }
+.quote-card .content { padding: 50px 60px; }
+.quote-text { font-family: var(--display); font-size: 62px; line-height: 1.05; text-transform: uppercase; }
+.quote-text::before { content: "“"; color: var(--stamp); }
+.quote-text::after { content: "”"; color: var(--stamp); }
+.quote-by { margin-top: 26px; font-size: 26px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); }
+.chain { position: absolute; left: 1030px; top: 820px; display: flex; align-items: center; gap: 18px; }
+.chain .arr { font-family: var(--display); font-size: 44px; }
+
+/* ===========================================
+   SLIDE 3 — PERSONA + NORTH STAR
+   =========================================== */
+.persona { left: 110px; top: 260px; width: 820px; height: 580px; --r: -2deg; }
+.persona .content { padding: 52px 60px 0 180px; }
+.persona-name { font-family: var(--display); font-size: 104px; line-height: 1; text-transform: uppercase; margin-top: 14px; }
+.facts { margin-top: 24px; }
+.facts li { font-size: 34px; font-weight: 700; line-height: 1.55; }
+.facts li::before { content: "▸ "; color: var(--stamp); }
+.jtbd { margin-top: 22px; font-size: 26px; font-style: italic; color: var(--ink-soft); border-top: 2px dashed rgba(38,34,31,0.3); padding-top: 18px; }
+.ns { position: absolute; left: 1030px; top: 290px; width: 780px; }
+.ns-big { font-family: var(--display); font-size: 116px; line-height: 0.95; text-transform: uppercase; margin-top: 34px; }
+.ns-sub { margin-top: 22px; font-size: 32px; font-weight: 700; }
+.ns-row { margin-top: 36px; display: flex; gap: 16px; }
+.ns .stamp-ns { position: relative; display: inline-block; font-size: 44px; --r: -3deg; }
+
+/* ===========================================
+   SLIDE 4 — MVP (three vertical tags + OUT list)
+   =========================================== */
+.vt { top: 330px; width: 380px; height: 600px; transform-origin: 50% 0; }
+.vt .content { padding: 120px 40px 0; text-align: center; }
+.vt-num { font-family: var(--display); font-size: 40px; color: var(--ink-soft); }
+.vt-name { font-family: var(--display); font-size: 60px; line-height: 1; text-transform: uppercase; margin-top: 10px; min-height: 120px; }
+.vt-why { margin-top: 28px; font-size: 30px; font-weight: 700; line-height: 1.4; }
+.vt-rice { position: absolute; left: 40px; right: 40px; bottom: 36px; font-size: 22px; font-weight: 700; letter-spacing: 0.12em; border-top: 2px dashed rgba(38,34,31,0.3); padding-top: 16px; text-align: center; }
+.vt1 { left: 110px; --r: -3deg; }
+.vt2 { left: 530px; --r: 1.5deg; }
+.vt3 { left: 950px; --r: -1deg; }
+.vt3 .vt-why { color: var(--stamp); }
+.out { position: absolute; left: 1420px; top: 350px; width: 400px; }
+.out-title { font-family: var(--display); font-size: 48px; text-transform: uppercase; }
+.out li { font-size: 30px; font-weight: 700; line-height: 1.7; text-decoration: line-through; text-decoration-color: var(--stamp); text-decoration-thickness: 3px; color: var(--ink-soft); }
+.out-why { margin-top: 18px; font-size: 25px; font-style: italic; }
+.converge { left: 1400px; top: 790px; font-size: 38px; --r: -4deg; }
+.converge small { font-size: 18px; }
+
+/* ===========================================
+   SLIDES 5–7 — EMBEDDED MOCKUPS (iframes, 1700×800)
+   pointer-events off so keyboard nav keeps working.
+   =========================================== */
+.mock { position: absolute; left: 178px; top: 238px; width: 1700px; height: 800px; transform: scale(0.92); transform-origin: 0 0; }
+.mock iframe { width: 1700px; height: 800px; border: 0; background: transparent; pointer-events: none; display: block; }
+.slide.visible .mock { animation: mockIn 900ms cubic-bezier(0.2, 0.9, 0.25, 1.05) 250ms both; }
+@keyframes mockIn { from { opacity: 0; transform: translateY(40px) scale(0.92); } to { opacity: 1; transform: scale(0.92); } }
+
+/* ===========================================
+   SLIDE 8 — DEFINITION OF DONE (Given / When / Then)
+   =========================================== */
+.gwt { top: 380px; width: 800px; height: 400px; }
+.gwt .content { padding: 44px 56px; }
+.gwt-a { left: 110px; --r: -1.5deg; }
+.gwt-b { left: 1010px; --r: 1.2deg; }
+.gwt-row { display: grid; grid-template-columns: 170px 1fr; align-items: baseline; padding: 20px 0; border-bottom: 2px dashed rgba(38,34,31,0.25); }
+.gwt-row:last-child { border-bottom: 0; }
+.gwt-k { font-family: var(--display); font-size: 40px; text-transform: uppercase; }
+.gwt-v { font-size: 32px; font-weight: 700; line-height: 1.3; }
+.gwt .stamp { right: 40px; top: -30px; font-size: 34px; }
+.qa { left: 700px; top: 860px; font-size: 48px; --r: -3deg; }
+.qa-note { position: absolute; left: 1120px; top: 890px; font-size: 30px; font-style: italic; }
+
+/* ===========================================
+   SLIDE 9 — RISKS → MITIGATIONS
+   =========================================== */
+.risk-row { position: absolute; left: 110px; right: 110px; height: 150px; display: flex; align-items: center; gap: 30px; }
+.risk-row .card { position: relative; height: 150px; filter: var(--shadow); }
+.risk-row .card .paper { border-radius: 6px; }
+.risk-row .card .content { display: flex; flex-direction: column; justify-content: center; padding: 0 40px; }
+.card.risk { width: 760px; }
+.card.fix { width: 850px; }
+.card.fix .paper { background: #f5eed8; }
+.risk-t { font-family: var(--display); font-size: 48px; line-height: 1; text-transform: uppercase; }
+.risk-m { margin-top: 12px; font-size: 22px; font-weight: 700; letter-spacing: 0.12em; color: var(--stamp); }
+.fix-t { font-size: 36px; font-weight: 700; line-height: 1.2; color: var(--go); }
+.fix-t::before { content: "✓ "; }
+.risk-arrow { width: 100px; height: 50px; flex: none; }
+.risk-arrow svg { width: 100px; height: 50px; }
+
+/* ===========================================
+   SLIDE 10 — GO / NO-GO
+   =========================================== */
+.go-label { position: absolute; left: 150px; top: 200px; font-size: 30px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
+.go-stamp { left: 150px; top: 290px; font-size: 460px; padding: 30px 70px 10px; border-width: 18px; border-radius: 30px; box-shadow: inset 0 0 0 12px transparent, inset 0 0 0 22px currentColor; --r: -8deg; letter-spacing: 0.04em; }
+.go-for { position: absolute; left: 150px; top: 880px; font-size: 26px; font-style: italic; width: 760px; }
+.go-list { position: absolute; left: 1020px; top: 250px; width: 800px; }
+.go-block { padding: 30px 0; border-bottom: 3px dashed rgba(38,34,31,0.3); }
+.go-block:last-child { border-bottom: 0; }
+.go-k { font-family: var(--display); font-size: 54px; text-transform: uppercase; line-height: 1; }
+.go-k.g { color: var(--go); }
+.go-k.r { color: var(--stamp); }
+.go-v { margin-top: 14px; font-size: 32px; font-weight: 700; line-height: 1.45; }
+
+/* ===========================================
+   SLIDE 11 — NOW / NEXT / LATER
+   =========================================== */
+.rm { top: 240px; width: 520px; height: 540px; transform-origin: 50% 0; }
+.rm .content { padding: 120px 44px 0; }
+.rm-h { font-family: var(--display); font-size: 84px; text-transform: uppercase; text-align: center; line-height: 1; }
+.rm ul { margin-top: 30px; }
+.rm li { font-size: 32px; font-weight: 700; line-height: 1.3; padding: 14px 0; border-top: 2px dashed rgba(38,34,31,0.25); }
+.rm1 { left: 110px; --r: -2deg; }
+.rm2 { left: 700px; --r: 1deg; }
+.rm3 { left: 1290px; --r: -1deg; }
+.rm1 .rm-h { color: var(--go); }
+.rm3 li { color: var(--ink-soft); }
+.next-stamp { left: 760px; top: 640px; font-size: 40px; --r: -5deg; z-index: 5; }
+.next-stamp small { font-size: 18px; }
+
+/* ===========================================
+   SLIDE 12 — THE HARD QUESTION
+   =========================================== */
+.hq { left: 210px; top: 190px; width: 1500px; height: 500px; --r: -1.5deg; transform-origin: 80px 250px; }
+.hq .content { padding: 80px 90px 0 220px; }
+.hq-title { margin-top: 26px; font-family: var(--display); font-size: 116px; line-height: 0.95; text-transform: uppercase; }
+.hq-sub { margin-top: 26px; font-size: 32px; font-weight: 700; color: var(--ink-soft); }
+.hq-answer { left: 330px; top: 760px; font-size: 90px; --r: -3deg; }
+.hq-note { position: absolute; left: 1330px; top: 800px; font-size: 34px; font-weight: 700; line-height: 1.4; }
+
+/* ===========================================
+   SLIDE 13 — THANK YOU (reuses the cover tag + string)
+   =========================================== */
+.ty-title { font-size: 190px; }
+.ty-stamps { position: absolute; left: 1360px; top: 260px; width: 460px; height: 600px; }
+.ty-stamps .t1 { --r: -6deg; left: 20px; top: 20px; font-size: 84px; letter-spacing: 0.03em; }
+.ty-stamps .t2 { --r: 7deg; left: 60px; top: 300px; font-size: 170px; letter-spacing: 0.06em; padding: 18px 40px 8px; }
+
+/* ===========================================
+   DECK UI (outside the stage): progress + edit mode
+   =========================================== */
+.progress { position: fixed; left: 0; bottom: 0; height: 4px; background: var(--stamp); z-index: 1000; transition: width 400ms ease; }
+.edit-hotzone { position: fixed; top: 0; left: 0; width: 80px; height: 80px; z-index: 10000; cursor: pointer; }
+.edit-toggle {
+  position: fixed; top: 16px; left: 16px; z-index: 10001; width: 44px; height: 44px; border-radius: 50%;
+  border: 2px solid var(--ink); background: var(--manila); font-size: 20px; cursor: pointer;
+  opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+}
+.edit-toggle.show, .edit-toggle.active { opacity: 1; pointer-events: auto; }
+.edit-toggle.active { background: var(--stamp); }
+body.editing [contenteditable="true"] { outline: 2px dashed rgba(216,67,30,0.6); outline-offset: 4px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .slide.visible .rv, .slide.visible .sw, .slide.visible .th, .slide.visible .dr, .slide.visible .mock { animation: none !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- Inline editing controls (hover top-left or press E) -->
+<div class="edit-hotzone" aria-hidden="true"></div>
+<button class="edit-toggle" id="editToggle" title="Edit mode (E)" aria-label="Toggle edit mode">✎</button>
+
+<div class="deck-viewport">
+  <main class="deck-stage" id="deckStage">
+
+    <!-- =========================================================
+         SLIDE 1 — COVER
+         ========================================================= -->
+    <section class="slide active" data-title="Cover">
+      <div class="grain" aria-hidden="true"></div>
+      <header class="chrome top rv" style="--d:100ms"><span>ReNest</span><span class="soft">Lot Nº 01</span></header>
+
+      <div class="wrap cover-tag sw" style="--d:200ms">
+        <div class="paper htag"></div>
+        <div class="grommet htag-g" aria-hidden="true"></div>
+        <div class="perf" aria-hidden="true"></div>
+        <div class="cover-body">
+          <div class="kicker">ReNest · Week recap</div>
+          <h1 class="cover-title">
+            <span class="rv" style="--d:700ms">Is it really</span>
+            <span class="rv" style="--d:850ms">as shown?</span>
+          </h1>
+          <p class="cover-sub rv" style="--d:1000ms">Closing the trust gap on used-item condition</p>
+        </div>
+        <svg class="string" viewBox="0 0 700 900" aria-hidden="true">
+          <path d="M604 840 C 560 700, 420 520, 300 380 S 120 120, 60 -40" />
+          <path d="M604 840 C 640 760, 600 640, 520 540 S 330 260, 250 -40" opacity="0.85" />
+        </svg>
+      </div>
+
+      <div class="cover-stamps" aria-hidden="true">
+        <div class="stamp s1 th" style="--d:1250ms">New</div>
+        <div class="stamp s2 th" style="--d:1450ms">Good</div>
+        <div class="stamp s3 red th" style="--d:1700ms"><small>Condition</small>Visible wear</div>
+      </div>
+
+      <footer class="chrome bot rv" style="--d:1700ms"><span>Adriel Mounzón Baspineiro</span><span>Sep 2026</span></footer>
+    </section>
+
+    <!-- =========================================================
+         SLIDE 2 — THE PROBLEM
+         ========================================================= -->
+    <section class="slide" data-title="Problem">
+      <div class="grain" aria-hidden="true"></div>
+      <header class="chrome top"><span>ReNest · The problem</span><span class="soft">Lot Nº 02</span></header>
+
+      <div class="head">
+        <div class="kicker rv">01 · The problem</div>
+        <h2 class="h2 rv" style="--d:120ms">A trust problem</h2>
+      </div>
+
+      <!-- Listing photo vs pickup reality -->
+      <div class="polaroid pol-a dr" style="--d:300ms">
+        <div class="tape"></div>
+        <div class="photo">
+          <svg viewBox="0 0 368 340" aria-hidden="true">
+            <rect width="368" height="340" fill="#eadcc4"/>
+            <rect y="250" width="368" height="90" fill="#dccbad"/>
+            <rect x="74" y="120" width="220" height="86" rx="20" fill="#8a6a4f"/>
+            <rect x="60" y="180" width="248" height="56" rx="14" fill="#9b7757"/>
+            <rect x="40" y="150" width="54" height="96" rx="20" fill="#7d5f45"/>
+            <rect x="274" y="150" width="54" height="96" rx="20" fill="#7d5f45"/>
+            <rect x="120" y="186" width="1.5" height="40" fill="#7d5f45" opacity=".5"/>
+            <rect x="246" y="186" width="1.5" height="40" fill="#7d5f45" opacity=".5"/>
+            <rect x="70" y="246" width="12" height="18" rx="3" fill="#4a3a2c"/>
+            <rect x="286" y="246" width="12" height="18" rx="3" fill="#4a3a2c"/>
+            <circle cx="300" cy="60" r="26" fill="#f6ecd6"/>
+          </svg>
+        </div>
+        <div class="cap">The listing</div>
+      </div>
+
+      <div class="polaroid pol-b dr" style="--d:600ms">
+        <div class="tape"></div>
+        <div class="photo">
+          <svg viewBox="0 0 368 340" aria-hidden="true">
+            <rect width="368" height="340" fill="#cdbfa6"/>
+            <rect y="250" width="368" height="90" fill="#b9a988"/>
+            <path d="M74 206 L74 140 Q74 120 94 120 L274 120 Q294 120 294 140 L294 206 Z" fill="#9c8670"/>
+            <path d="M60 196 Q120 222 184 200 Q250 222 308 196 L308 236 L60 236 Z" fill="#a8927a"/>
+            <rect x="40" y="150" width="54" height="96" rx="20" fill="#8e785f"/>
+            <rect x="274" y="150" width="54" height="96" rx="16" fill="#8e785f"/>
+            <ellipse cx="150" cy="160" rx="30" ry="18" fill="#5a4230" opacity=".35"/>
+            <ellipse cx="240" cy="214" rx="22" ry="10" fill="#5a4230" opacity=".3"/>
+            <path d="M280 170 l10 -8 l6 12 l10 -8 l6 12" stroke="#3a2a1c" stroke-width="4" fill="none"/>
+            <circle cx="296" cy="176" r="7" fill="#f3ecdf"/><circle cx="305" cy="170" r="5" fill="#f3ecdf"/>
+            <rect x="70" y="246" width="12" height="18" rx="3" fill="#4a3a2c"/>
+            <rect x="286" y="246" width="12" height="12" rx="3" fill="#4a3a2c" transform="rotate(14 292 252)"/>
+          </svg>
+        </div>
+        <div class="cap">Pickup day</div>
+      </div>
+      <div class="stamp red neq th" style="--d:1000ms">≠</div>
+
+      <!-- Sonia's quote -->
+      <div class="wrap quote-card rv" style="--d:900ms">
+        <div class="paper ticket"></div>
+        <div class="content">
+          <p class="quote-text">Photos always look good, but the product is almost never as shown.</p>
+          <p class="quote-by">— Sonia, 30</p>
+        </div>
+      </div>
+
+      <!-- Consequence chain -->
+      <div class="chain">
+        <span class="chip rv" style="--d:1300ms">Doubt</span><span class="arr rv" style="--d:1400ms">→</span>
+        <span class="chip rv" style="--d:1500ms">No message</span><span class="arr rv" style="--d:1600ms">→</span>
+        <span class="chip red rv" style="--d:1700ms">Other platform</span>
+      </div>
+
+      <footer class="chrome bot"><span>Adriel Mounzón Baspineiro</span><span>02 / 13</span></footer>
+    </section>
+
+    <!-- =========================================================
+         SLIDE 3 — WHO + NORTH STAR
+         ========================================================= -->
+    <section class="slide" data-title="Persona + North Star">
+      <div class="grain" aria-hidden="true"></div>
+      <header class="chrome top"><span>ReNest · Who &amp; success</span><span class="soft">Lot Nº 03</span></header>
+
+      <div class="head">
+        <div class="kicker rv">02 · Who &amp; what success means</div>
+      </div>
+
+      <!-- Persona hang tag -->
+      <div class="wrap persona sw" style="--d:150ms; transform-origin: 70px 290px;">
+        <div class="paper htag"></div>
+        <div class="grommet htag-g" aria-hidden="true"></div>
+        <div class="content">
+          <div class="kicker">Primary persona</div>
+          <p class="persona-name">Sonia, 30</p>
+          <ul class="facts">
+            <li>Tight budget</li>
+            <li>Furnishing new apartment</li>
+            <li>Phone · late at night</li>
+            <li>Sofa ≤ 20 min away</li>
+          </ul>
+          <p class="jtbd">Job: know the real condition <b>before</b> messaging</p>
+        </div>
+      </div>
+
+      <!-- North Star -->
+      <div class="ns">
+        <span class="stamp inline stamp-ns green th" style="--d:600ms">North Star</span>
+        <p class="ns-big rv" style="--d:800ms">Clean purchases<br>per week</p>
+        <p class="ns-sub rv" style="--d:950ms">No condition dispute · no return</p>
+        <div class="ns-row">
+          <span class="chip green rv" style="--d:1150ms">✓ Real behavior</span>
+          <span class="chip red rv" style="--d:1300ms">✗ Optional reviews</span>
+        </div>
+      </div>
+
+      <footer class="chrome bot"><span>Adriel Mounzón Baspineiro</span><span>03 / 13</span></footer>
+    </section>
+
+    <!-- =========================================================
+         SLIDE 4 — THE MVP + WHY
+         ========================================================= -->
+    <section class="slide" data-title="MVP">
+      <div class="grain" aria-hidden="true"></div>
+      <header class="chrome top"><span>ReNest · The MVP</span><span class="soft">Lot Nº 04</span></header>
+
+      <div class="head">
+        <div class="kicker rv">03 · The MVP &amp; why</div>
+        <h2 class="h2 rv" style="--d:120ms">3 in. 4 out.</h2>
+      </div>
+
+      <div class="wrap vt vt1 sw" style="--d:250ms">
+        <div class="paper vtag"></div><div class="grommet vtag-g" aria-hidden="true"></div>
+        <div class="content">
+          <p class="vt-num">01</p>
+          <p class="vt-name">Condition badge</p>
+          <p class="vt-why">Closes trust gap<br>Cheapest build</p>
+          <p class="vt-rice">RICE 24.3 · #1</p>
+        </div>
+      </div>
+      <div class="wrap vt vt2 sw" style="--d:450ms">
+        <div class="paper vtag"></div><div class="grommet vtag-g" aria-hidden="true"></div>
+        <div class="content">
+          <p class="vt-num">02</p>
+          <p class="vt-name">3+ real photos</p>
+          <p class="vt-why">Forces evidence<br>Same cheap build</p>
+          <p class="vt-rice">RICE 15.3 · #2</p>
+        </div>
+      </div>
+      <div class="wrap vt vt3 sw" style="--d:650ms">
+        <div class="paper vtag"></div><div class="grommet vtag-g" aria-hidden="true"></div>
+        <div class="content">
+          <p class="vt-num">03</p>
+          <p class="vt-name">Mismatch report</p>
+          <p class="vt-why">Not a fix —<br>the measuring stick</p>
+          <p class="vt-rice">RICE 8.1 · #3</p>
+        </div>
+      </div>
+
+      <div class="out">
+        <p class="out-title rv" style="--d:900ms">Out · for now</p>
+        <ul>
+          <li class="rv" style="--d:1000ms">Response time</li>
+          <li class="rv" style="--d:1080ms">Ask-a-question</li>
+          <li class="rv" style="--d:1160ms">High-res photos</li>
+          <li class="rv" style="--d:1240ms">Verified seller</li>
+        </ul>
+        <p class="out-why rv" style="--d:1350ms">Needs data we don't have yet — or a later step</p>
+      </div>
+      <div class="stamp red converge th" style="--d:1600ms"><small>RICE · MoSCoW · North Star</small>Same call</div>
+
+      <footer class="chrome bot"><span>Adriel Mounzón Baspineiro</span><span>04 / 13</span></footer>
+    </section>
+
+    <!-- =========================================================
+         SLIDE 5 — MOCKUP: BUYER BEFORE / AFTER
+         ========================================================= -->
+    <section class="slide" data-title="Buyer before/after">
+      <div class="grain" aria-hidden="true"></div>
+      <header class="chrome top"><span>ReNest · MVP in action</span><span class="soft">Lot Nº 05</span></header>
+      <div class="head compact">
+        <div class="kicker rv">Before → After · Buyer</div>
+        <h2 class="h2 rv" style="--d:120ms">What Sonia sees</h2>
+      </div>
+      <div class="mock"><iframe src="mockups/buyer-listing.html" title="Buyer listing before and after" loading="eager" scrolling="no"></iframe></div>
+      <footer class="chrome bot"><span></span><span>05 / 13</span></footer>
+    </section>
+
+    <!-- =========================================================
+         SLIDE 6 — MOCKUP: SELLER BEFORE / AFTER
+         ========================================================= -->
+    <section class="slide" data-title="Seller before/after">
+      <div class="grain" aria-hidden="true"></div>
+      <header class="chrome top"><span>ReNest · MVP in action</span><span class="soft">Lot Nº 06</span></header>
+      <div class="head compact">
+        <div class="kicker rv">Before → After · Seller</div>
+        <h2 class="h2 rv" style="--d:120ms">What sellers must do</h2>
+      </div>
+      <div class="mock"><iframe src="mockups/seller-publish.html" title="Seller publish flow before and after" loading="eager" scrolling="no"></iframe></div>
+      <footer class="chrome bot"><span></span><span>06 / 13</span></footer>
+    </section>
+
+    <!-- =========================================================
+         SLIDE 7 — MOCKUP: REPORT FLOW
+         ========================================================= -->
+    <section class="slide" data-title="Report flow">
+      <div class="grain" aria-hidden="true"></div>
+      <header class="chrome top"><span>ReNest · MVP in action</span><span class="soft">Lot Nº 07</span></header>
+      <div class="head compact">
+        <div class="kicker rv">New · Measurement</div>
+        <h2 class="h2 rv" style="--d:120ms">How we know it works</h2>
+      </div>
+      <div class="mock"><iframe src="mockups/report-flow.html" title="Doesn't match description report flow" loading="eager" scrolling="no"></iframe></div>
+      <footer class="chrome bot"><span></span><span>07 / 13</span></footer>
+    </section>
+
+    <!-- =========================================================
+         SLIDE 8 — WHAT "DONE" MEANS (feature #1)
+         ========================================================= -->
+    <section class="slide" data-title="Definition of done">
+      <div class="grain" aria-hidden="true"></div>
+      <header class="chrome top"><span>ReNest · Definition of done</span><span class="soft">Lot Nº 08</span></header>
+
+      <div class="head">
+        <div class="kicker rv">04 · Feature #1 · Condition badge</div>
+        <h2 class="h2 rv" style="--d:120ms">What "done" means</h2>
+      </div>
+
+      <div class="wrap gwt gwt-a dr" style="--d:300ms">
+        <div class="paper ticket"></div>
+        <div class="content">
+          <div class="gwt-row"><span class="gwt-k">Given</span><span class="gwt-v">Seller publishing</span></div>
+          <div class="gwt-row"><span class="gwt-k">When</span><span class="gwt-v">Taps Publish, no status</span></div>
+          <div class="gwt-row"><span class="gwt-k">Then</span><span class="gwt-v">Blocked · field flagged</span></div>
+        </div>
+        <div class="stamp red th" style="--d:900ms; --r:6deg">Unhappy path</div>
+      </div>
+
+      <div class="wrap gwt gwt-b dr" style="--d:550ms">
+        <div class="paper ticket"></div>
+        <div class="content">
+          <div class="gwt-row"><span class="gwt-k">Given</span><span class="gwt-v">Status selected</span></div>
+          <div class="gwt-row"><span class="gwt-k">When</span><span class="gwt-v">Buyer opens listing</span></div>
+          <div class="gwt-row"><span class="gwt-k">Then</span><span class="gwt-v">Badge on card + detail</span></div>
+        </div>
+        <div class="stamp green th" style="--d:1100ms; --r:-5deg">Happy path</div>
+      </div>
+
+      <div class="stamp qa th" style="--d:1400ms">Testable by QA</div>
+      <p class="qa-note rv" style="--d:1600ms">not "looks good"</p>
+
+      <footer class="chrome bot"><span>Adriel Mounzón Baspineiro</span><span>08 / 13</span></footer>
+    </section>
+
+    <!-- =========================================================
+         SLIDE 9 — RISKS → MITIGATIONS
+         ========================================================= -->
+    <section class="slide" data-title="Risks">
+      <div class="grain" aria-hidden="true"></div>
+      <header class="chrome top"><span>ReNest · Risks</span><span class="soft">Lot Nº 09</span></header>
+
+      <div class="head">
+        <div class="kicker rv">05 · Top risks · Condition badge</div>
+        <h2 class="h2 rv" style="--d:120ms">Every risk, an answer</h2>
+      </div>
+
+      <div class="risk-row" style="top:380px">
+        <div class="card risk rv" style="--d:300ms; --r:-1deg"><div class="paper"></div><div class="content">
+          <p class="risk-t">Optimistic status</p><p class="risk-m">LIKELIHOOD HIGH · IMPACT HIGH</p></div></div>
+        <div class="risk-arrow rv" style="--d:450ms"><svg viewBox="0 0 100 50" aria-hidden="true"><path d="M4 25 H84 M66 8 L90 25 L66 42" stroke="#26221f" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="card fix rv" style="--d:550ms; --r:0.8deg"><div class="paper"></div><div class="content">
+          <p class="fix-t">Example next to each status</p></div></div>
+      </div>
+
+      <div class="risk-row" style="top:570px">
+        <div class="card risk rv" style="--d:750ms; --r:0.8deg"><div class="paper"></div><div class="content">
+          <p class="risk-t">Badge lost among tags</p><p class="risk-m">LIKELIHOOD MED · IMPACT MED</p></div></div>
+        <div class="risk-arrow rv" style="--d:900ms"><svg viewBox="0 0 100 50" aria-hidden="true"><path d="M4 25 H84 M66 8 L90 25 L66 42" stroke="#26221f" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="card fix rv" style="--d:1000ms; --r:-0.8deg"><div class="paper"></div><div class="content">
+          <p class="fix-t">Design review before build</p></div></div>
+      </div>
+
+      <div class="risk-row" style="top:760px">
+        <div class="card risk rv" style="--d:1200ms; --r:-0.6deg"><div class="paper"></div><div class="content">
+          <p class="risk-t">Buyers still don't trust</p><p class="risk-m">LIKELIHOOD LOW · IMPACT HIGH</p></div></div>
+        <div class="risk-arrow rv" style="--d:1350ms"><svg viewBox="0 0 100 50" aria-hidden="true"><path d="M4 25 H84 M66 8 L90 25 L66 42" stroke="#26221f" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="card fix rv" style="--d:1450ms; --r:1deg"><div class="paper"></div><div class="content">
+          <p class="fix-t">Watch North Star · 2 weeks</p></div></div>
+      </div>
+
+      <footer class="chrome bot"><span>Adriel Mounzón Baspineiro</span><span>09 / 13</span></footer>
+    </section>
+
+    <!-- =========================================================
+         SLIDE 10 — GO / NO-GO
+         ========================================================= -->
+    <section class="slide" data-title="Go / No-go">
+      <div class="grain" aria-hidden="true"></div>
+      <header class="chrome top"><span>ReNest · Go / No-go</span><span class="soft">Lot Nº 10</span></header>
+
+      <p class="go-label rv">06 · Recommendation</p>
+      <div class="stamp green go-stamp th" style="--d:300ms">Go</div>
+      <p class="go-for rv" style="--d:900ms">Biggest risk covered by early North Star monitoring</p>
+
+      <div class="go-list">
+        <div class="go-block rv" style="--d:1000ms">
+          <p class="go-k g">Ship when</p>
+          <p class="go-v">✓ Acceptance criteria pass<br>✓ Statuses reviewed by a real seller</p>
+        </div>
+        <div class="go-block rv" style="--d:1250ms">
+          <p class="go-k r">Roll back if</p>
+          <p class="go-v">North Star &lt; baseline · first 2 weeks</p>
+        </div>
+        <div class="go-block rv" style="--d:1500ms">
+          <p class="go-k">Watch</p>
+          <p class="go-v">North Star + % buyers messaging sellers</p>
+        </div>
+      </div>
+
+      <footer class="chrome bot"><span>Adriel Mounzón Baspineiro</span><span>10 / 13</span></footer>
+    </section>
+
+    <!-- =========================================================
+         SLIDE 11 — NOW / NEXT / LATER
+         ========================================================= -->
+    <section class="slide" data-title="Roadmap">
+      <div class="grain" aria-hidden="true"></div>
+      <header class="chrome top"><span>ReNest · What's next</span><span class="soft">Lot Nº 11</span></header>
+
+      <div class="head">
+        <div class="kicker rv">07 · Roadmap</div>
+      </div>
+
+      <div class="wrap rm rm1 sw" style="--d:150ms">
+        <div class="paper vtag"></div><div class="grommet vtag-g" aria-hidden="true"></div>
+        <div class="content">
+          <p class="rm-h">Now</p>
+          <ul><li>Condition badge</li><li>3+ real photos</li><li>Mismatch report</li></ul>
+        </div>
+      </div>
+      <div class="wrap rm rm2 sw" style="--d:400ms">
+        <div class="paper vtag"></div><div class="grommet vtag-g" aria-hidden="true"></div>
+        <div class="content">
+          <p class="rm-h">Next</p>
+          <ul><li>Seller response time</li><li>Ask-a-question</li></ul>
+        </div>
+      </div>
+      <div class="wrap rm rm3 sw" style="--d:650ms">
+        <div class="paper vtag"></div><div class="grommet vtag-g" aria-hidden="true"></div>
+        <div class="content">
+          <p class="rm-h">Later</p>
+          <ul><li>High-res photos</li><li>Verified seller</li></ul>
+        </div>
+      </div>
+      <div class="stamp red next-stamp th" style="--d:1200ms"><small>Should · Big bet · Moves NSM</small>Strongest next</div>
+
+      <footer class="chrome bot"><span>Adriel Mounzón Baspineiro</span><span>11 / 13</span></footer>
+    </section>
+
+    <!-- =========================================================
+         SLIDE 12 — THE HARD QUESTION
+         ========================================================= -->
+    <section class="slide" data-title="Hard question">
+      <div class="grain" aria-hidden="true"></div>
+      <header class="chrome top"><span>ReNest · The hard question</span><span class="soft">Lot Nº 12</span></header>
+
+      <div class="wrap hq sw" style="--d:150ms">
+        <div class="paper htag"></div>
+        <div class="grommet htag-g" aria-hidden="true"></div>
+        <div class="perf" style="left:160px" aria-hidden="true"></div>
+        <div class="content">
+          <div class="kicker">The hard question</div>
+          <p class="hq-title">Why 2 weeks<br>on a report?</p>
+          <p class="hq-sub">…instead of a 4th trust signal buyers can see</p>
+        </div>
+      </div>
+
+      <div class="stamp red hq-answer th" style="--d:1000ms">No report = no proof</div>
+      <p class="hq-note rv" style="--d:1400ms">Otherwise →<br>shipping blind</p>
+
+      <footer class="chrome bot"><span>Adriel Mounzón Baspineiro</span><span>12 / 13</span></footer>
+    </section>
+
+    <!-- =========================================================
+         SLIDE 13 — THANK YOU
+         ========================================================= -->
+    <section class="slide" data-title="Thank you">
+      <div class="grain" aria-hidden="true"></div>
+      <header class="chrome top rv" style="--d:100ms"><span>ReNest</span><span class="soft">Lot Nº 13</span></header>
+
+      <div class="wrap cover-tag sw" style="--d:200ms">
+        <div class="paper htag"></div>
+        <div class="grommet htag-g" aria-hidden="true"></div>
+        <div class="perf" aria-hidden="true"></div>
+        <div class="cover-body">
+          <div class="kicker">ReNest · Week recap</div>
+          <h2 class="cover-title ty-title">
+            <span class="rv" style="--d:700ms">Thank</span>
+            <span class="rv" style="--d:850ms">you.</span>
+          </h2>
+        </div>
+        <svg class="string" viewBox="0 0 700 900" aria-hidden="true">
+          <path d="M604 840 C 560 700, 420 520, 300 380 S 120 120, 60 -40" />
+          <path d="M604 840 C 640 760, 600 640, 520 540 S 330 260, 250 -40" opacity="0.85" />
+        </svg>
+      </div>
+
+      <div class="ty-stamps" aria-hidden="true">
+        <div class="stamp green t1 th" style="--d:1250ms"><small>Condition</small>As shown</div>
+        <div class="stamp red t2 th" style="--d:1550ms">Sold</div>
+      </div>
+
+      <footer class="chrome bot rv" style="--d:1700ms"><span>Adriel Mounzón Baspineiro</span><span>13 / 13</span></footer>
+    </section>
+
+  </main>
+</div>
+<div class="progress" id="progress"></div>
+
+<script>
+/* ===========================================
+   SLIDE PRESENTATION CONTROLLER
+   Stage scaling, keyboard / wheel / touch nav, progress bar.
+   =========================================== */
+class SlidePresentation {
+  constructor() {
+    this.slides = Array.from(document.querySelectorAll('.slide'));
+    this.stage = document.getElementById('deckStage');
+    this.progress = document.getElementById('progress');
+    this.current = 0;
+    this.wheelLock = false;
+    this.setupStageScale();
+    this.setupKeyboardNav();
+    this.setupWheelNav();
+    this.setupTouchNav();
+    const fromHash = parseInt(location.hash.replace('#', ''), 10);
+    this.show(Number.isFinite(fromHash) ? fromHash - 1 : 0);
+  }
+
+  // Scale the 1920×1080 stage uniformly to fit the window (letterbox, no reflow)
+  setupStageScale() {
+    const fit = () => {
+      const f = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+      const x = (window.innerWidth - 1920 * f) / 2;
+      const y = (window.innerHeight - 1080 * f) / 2;
+      this.stage.style.transform = `translate(${x}px, ${y}px) scale(${f})`;
+    };
+    fit();
+    window.addEventListener('resize', fit);
+  }
+
+  setupKeyboardNav() {
+    document.addEventListener('keydown', (e) => {
+      if (e.target.isContentEditable) return;
+      if (['ArrowRight', 'ArrowDown', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); this.show(this.current + 1); }
+      if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key)) { e.preventDefault(); this.show(this.current - 1); }
+      if (e.key === 'Home') this.show(0);
+      if (e.key === 'End') this.show(this.slides.length - 1);
+    });
+  }
+
+  setupWheelNav() {
+    window.addEventListener('wheel', (e) => {
+      if (this.wheelLock || Math.abs(e.deltaY) < 30) return;
+      this.wheelLock = true;
+      this.show(this.current + (e.deltaY > 0 ? 1 : -1));
+      setTimeout(() => { this.wheelLock = false; }, 800);
+    }, { passive: true });
+  }
+
+  setupTouchNav() {
+    let startX = null;
+    window.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; }, { passive: true });
+    window.addEventListener('touchend', (e) => {
+      if (startX === null) return;
+      const dx = e.changedTouches[0].clientX - startX;
+      if (Math.abs(dx) > 50) this.show(this.current + (dx < 0 ? 1 : -1));
+      startX = null;
+    });
+  }
+
+  // Toggle .active/.visible (visibility-based, never display:none)
+  show(index) {
+    this.current = Math.max(0, Math.min(index, this.slides.length - 1));
+    this.slides.forEach((s, i) => {
+      const on = i === this.current;
+      s.classList.toggle('active', on);
+      s.classList.toggle('visible', on);
+    });
+    this.progress.style.width = `${((this.current + 1) / this.slides.length) * 100}%`;
+    history.replaceState(null, '', `#${this.current + 1}`);
+  }
+}
+
+/* ===========================================
+   INLINE EDITOR
+   E or top-left hover → edit text; Ctrl/Cmd+S downloads the edited HTML.
+   Edits auto-save to localStorage.
+   =========================================== */
+class InlineEditor {
+  constructor() {
+    this.isActive = false;
+    this.key = 'renest-deck-edits-v1';
+    this.targets = Array.from(document.querySelectorAll('.slide p, .slide h1 span, .slide h2, .slide li, .slide .kicker, .slide .chip, .slide .stamp, .slide .gwt-v, .slide .gwt-k, .chrome span'));
+    this.toggleBtn = document.getElementById('editToggle');
+    this.restore();
+    this.bind();
+  }
+  bind() {
+    const hotzone = document.querySelector('.edit-hotzone');
+    let hideTimeout = null;
+    const hideLater = () => { hideTimeout = setTimeout(() => { if (!this.isActive) this.toggleBtn.classList.remove('show'); }, 400); };
+    hotzone.addEventListener('mouseenter', () => { clearTimeout(hideTimeout); this.toggleBtn.classList.add('show'); });
+    hotzone.addEventListener('mouseleave', hideLater);
+    this.toggleBtn.addEventListener('mouseenter', () => clearTimeout(hideTimeout));
+    this.toggleBtn.addEventListener('mouseleave', hideLater);
+    hotzone.addEventListener('click', () => this.toggle());
+    this.toggleBtn.addEventListener('click', () => this.toggle());
+    document.addEventListener('keydown', (e) => {
+      if ((e.key === 'e' || e.key === 'E') && !e.target.isContentEditable) this.toggle();
+      if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); this.download(); }
+    });
+    this.targets.forEach((el) => el.addEventListener('input', () => this.save()));
+  }
+  toggle() {
+    this.isActive = !this.isActive;
+    document.body.classList.toggle('editing', this.isActive);
+    this.toggleBtn.classList.toggle('active', this.isActive);
+    this.targets.forEach((el) => el.setAttribute('contenteditable', this.isActive ? 'true' : 'false'));
+  }
+  save() {
+    try { localStorage.setItem(this.key, JSON.stringify(this.targets.map((el) => el.innerHTML))); } catch (e) {}
+  }
+  restore() {
+    try {
+      const data = JSON.parse(localStorage.getItem(this.key) || 'null');
+      if (Array.isArray(data) && data.length === this.targets.length) data.forEach((html, i) => { this.targets[i].innerHTML = html; });
+    } catch (e) {}
+  }
+  download() {
+    if (this.isActive) this.toggle();
+    const html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
+    a.download = 'index.html';
+    a.click();
+  }
+}
+
+new SlidePresentation();
+new InlineEditor();
+</script>
+</body>
+</html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Buyer Listing Before/After</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Big+Shoulders+Display:wght@800;900&family=Courier+Prime:wght@400;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700;9..40,800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --kraft:#c4a37a; --manila:#ecdcb2; --ink:#26221f; --ink-soft:rgba(38,34,31,.62);
+    --stamp:#d8431e; --green:#2f5d50;
+    /* app tokens (from renest prototypes) */
+    --a-ink:#1f1d1a; --a-muted:#6b665e; --a-line:#e2ddd4; --a-accent:#2f5d50;
+    --vw-bg:#fef3c7; --vw-fg:#78350f;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1700px;height:800px;margin:0;overflow:hidden;background:transparent}
+  body{position:relative;color:var(--ink);font-family:'Courier Prime',monospace}
+
+  /* ---------- stamps ---------- */
+  .stamp{position:absolute;font-family:'Big Shoulders Display',sans-serif;font-weight:900;text-transform:uppercase;
+    font-size:52px;line-height:1;letter-spacing:.06em;padding:6px 22px 4px;border:6px solid currentColor;border-radius:8px;
+    mix-blend-mode:multiply;opacity:.9}
+  .stamp.before{color:var(--stamp);left:465px;top:14px;transform:rotate(-5deg)}
+  .stamp.after{color:var(--green);left:1060px;top:14px;transform:rotate(4deg)}
+
+  /* ---------- phones ---------- */
+  .phone{position:absolute;top:108px;width:400px;height:664px;background:#fff;border:11px solid #1f1d1a;border-radius:44px;
+    overflow:hidden;display:flex;flex-direction:column;filter:drop-shadow(0 22px 26px rgba(60,38,15,.35));
+    font-family:'DM Sans',sans-serif;color:var(--a-ink)}
+  .phone.p-before{left:380px}
+  .phone.p-after{left:920px}
+  .status{height:30px;padding:8px 24px 0;display:flex;justify-content:space-between;font-size:13px;font-weight:700}
+  .status .notch{width:96px;height:22px;background:#1f1d1a;border-radius:12px;margin-top:-4px}
+  .bar{padding:10px 18px 12px;border-bottom:1px solid var(--a-line);font-weight:700;font-size:19px;display:flex;justify-content:space-between;align-items:center}
+  .bar small{font-weight:500;color:var(--a-muted);font-size:20px}
+  .screen{padding:16px 18px;flex:1;font-size:16px}
+
+  .hero{height:228px;border-radius:14px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+  .hero svg{width:58%;height:auto}
+  .p-before .hero svg{filter:blur(5px)}
+  .count{position:absolute;right:10px;bottom:10px;background:rgba(0,0,0,.6);color:#fff;font-size:14px;font-weight:500;padding:3px 11px;border-radius:12px}
+  .thumbs{display:flex;gap:8px;margin-top:8px}
+  .thumbs div{flex:1;height:44px;border-radius:8px;background:#e9dccb;display:flex;align-items:center;justify-content:center;font-size:12px;color:#7a6a55;font-weight:700}
+  .thumbs div.on{outline:2.5px solid var(--a-accent)}
+  .row{display:flex;align-items:center;justify-content:space-between;margin-top:14px}
+  .big{font-size:30px;font-weight:800;line-height:1.1}
+  .ttl{font-weight:700;font-size:18px;margin-top:2px}
+  .badge{display:inline-flex;align-items:center;gap:5px;font-size:16px;font-weight:700;border-radius:8px;padding:5px 12px;line-height:1.3;background:var(--vw-bg);color:var(--vw-fg)}
+  .desc{color:var(--a-muted);margin-top:10px;line-height:1.45;font-size:17px}
+  .cond{background:#fbf6ea;border-radius:10px;padding:11px 13px;margin-top:12px;font-size:15px;color:#5b4a2e;line-height:1.42}
+  .seller{display:flex;align-items:center;gap:10px;margin-top:16px;padding-top:14px;border-top:1px solid var(--a-line);font-size:16px}
+  .seller .dist{color:var(--a-muted);font-size:13px}
+  .av{width:36px;height:36px;border-radius:50%;background:#d8cfc2}
+  .btn{display:block;width:100%;text-align:center;background:var(--a-accent);color:#fff;border-radius:12px;padding:14px;font-weight:700;font-size:17px;margin-top:16px}
+
+  /* ---------- annotations ---------- */
+  .tag{position:absolute;background:var(--manila);font-family:'Courier Prime',monospace;font-weight:700;text-transform:uppercase;
+    font-size:23px;letter-spacing:.08em;line-height:1.15;padding:10px 16px 9px;border-radius:3px;
+    box-shadow:0 3px 6px rgba(60,38,15,.28);white-space:nowrap}
+  .tag::before{content:"";position:absolute;top:50%;width:10px;height:10px;margin-top:-5px;border-radius:50%;background:var(--kraft);box-shadow:inset 0 1px 2px rgba(0,0,0,.35)}
+  .tag.l::before{left:9px}
+  .tag.r::before{left:9px}
+  .tag{padding-left:30px}
+  .tag.bad{color:var(--stamp);border-left:6px solid var(--stamp)}
+  .tag.good{color:var(--green);border-left:6px solid var(--green)}
+
+  svg.lines{position:absolute;left:0;top:0;width:1700px;height:800px;pointer-events:none}
+
+  .mid{position:absolute;left:790px;top:380px;width:120px;text-align:center}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="sofa" viewBox="0 0 120 70">
+    <rect x="14" y="8" width="92" height="32" rx="8" fill="currentColor" opacity=".85"/>
+    <rect x="4" y="26" width="22" height="32" rx="7" fill="currentColor"/>
+    <rect x="94" y="26" width="22" height="32" rx="7" fill="currentColor"/>
+    <rect x="20" y="36" width="80" height="20" rx="5" fill="currentColor" opacity=".95"/>
+    <rect x="12" y="58" width="6" height="8" rx="2" fill="#3b3328"/>
+    <rect x="102" y="58" width="6" height="8" rx="2" fill="#3b3328"/>
+  </symbol>
+</svg>
+
+<div class="stamp before">Before</div>
+<div class="stamp after">After</div>
+
+<!-- BEFORE phone -->
+<div class="phone p-before">
+  <div class="status"><span>9:41</span><span class="notch"></span><span>●●● ▮</span></div>
+  <div class="bar">← Listing <small>♡</small></div>
+  <div class="screen">
+    <div class="hero" style="background:#efe6da;color:#8a6a4a"><svg viewBox="0 0 120 70"><use href="#sofa"/></svg><span class="count">1 / 1</span></div>
+    <div class="row"><span class="big">$180</span></div>
+    <div class="ttl">Grey 3-seat sofa</div>
+    <div class="desc">"Sofa, good. Pick up only."</div>
+    <div class="seller"><div class="av"></div><div><b>Marco</b><div class="dist">Joined 2025</div></div></div>
+    <div class="btn">Message seller</div>
+  </div>
+</div>
+
+<!-- AFTER phone -->
+<div class="phone p-after">
+  <div class="status"><span>9:41</span><span class="notch"></span><span>●●● ▮</span></div>
+  <div class="bar">← Listing <small>♡</small></div>
+  <div class="screen">
+    <div class="hero" style="background:#efe6da;color:#8a6a4a"><svg viewBox="0 0 120 70"><use href="#sofa"/></svg><span class="count">1 / 4</span></div>
+    <div class="thumbs"><div class="on">Front</div><div>Side</div><div>Armrest</div><div>Cushion</div></div>
+    <div class="row"><span class="big">$180</span><span class="badge">◐ Visible wear</span></div>
+    <div class="ttl">Grey 3-seat sofa</div>
+    <div class="cond"><b>Visible wear:</b> usable, with marks you'll notice. Seller note: small scuff on left armrest (see photo 3).</div>
+    <div class="btn">Message seller</div>
+  </div>
+</div>
+
+<!-- middle arrow -->
+<svg class="lines" viewBox="0 0 1700 800">
+  <!-- center arrow -->
+  <path d="M790 440 C 825 425, 865 452, 902 436" fill="none" stroke="#26221f" stroke-width="5" stroke-linecap="round"/>
+  <path d="M884 420 L905 435 L886 454" fill="none" stroke="#26221f" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- before leaders -->
+  <g stroke="#d8431e" stroke-width="2.5" fill="#d8431e">
+    <line x1="330" y1="332" x2="480" y2="332"/><circle cx="480" cy="332" r="5"/>
+    <line x1="332" y1="476" x2="402" y2="476"/><circle cx="402" cy="476" r="5"/>
+    <line x1="320" y1="541" x2="402" y2="541"/><circle cx="402" cy="541" r="5"/>
+  </g>
+  <!-- after leaders -->
+  <g stroke="#2f5d50" stroke-width="2.5" fill="#2f5d50">
+    <polyline fill="none" points="1391,422 1330,422 1296,476"/><circle cx="1296" cy="476" r="5"/>
+    <line x1="1296" y1="528" x2="1391" y2="528"/><circle cx="1296" cy="528" r="5"/>
+    <line x1="1296" y1="628" x2="1391" y2="628"/><circle cx="1296" cy="628" r="5"/>
+  </g>
+</svg>
+
+<!-- annotations: before -->
+<div class="tag l bad" style="left:56px;top:305px;transform:rotate(-2deg)">1 blurry photo</div>
+<div class="tag l bad" style="left:90px;top:450px;transform:rotate(1.5deg)">No condition</div>
+<div class="tag l bad" style="left:110px;top:515px;transform:rotate(-1.5deg)">Vague text</div>
+
+<!-- annotations: after -->
+<div class="tag r good" style="left:1392px;top:395px;transform:rotate(2deg)">4 real photos</div>
+<div class="tag r good" style="left:1392px;top:502px;transform:rotate(-1.5deg)">Condition badge</div>
+<div class="tag r good" style="left:1392px;top:589px;transform:rotate(1.5deg);white-space:normal;width:270px">Know before messaging</div>
+</body>
+</html>

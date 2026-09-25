@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Report Flow Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Big+Shoulders+Display:wght@800;900&family=Courier+Prime:wght@400;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700;9..40,800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --kraft:#c4a37a; --manila:#ecdcb2; --ink:#26221f; --ink-soft:rgba(38,34,31,.62);
+    --stamp:#d8431e; --green:#2f5d50;
+    /* app tokens (from renest-after.html) */
+    --app-ink:#1f1d1a; --muted:#6b665e; --line:#e2ddd4; --accent:#2f5d50;
+    --good:#15803d; --good-soft:#ecf7ef; --err:#b91c1c;
+    --vw-bg:#fef3c7; --vw-fg:#78350f;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1700px;height:800px;margin:0;overflow:hidden;background:transparent}
+  body{position:relative;color:var(--ink);font-family:'Courier Prime',monospace}
+
+  /* ---------- presentation layer ---------- */
+  .label{position:absolute;background:var(--manila);font-family:'Courier Prime',monospace;font-weight:700;
+    text-transform:uppercase;letter-spacing:.08em;font-size:22px;color:var(--ink);padding:10px 18px 9px;
+    box-shadow:0 3px 6px rgba(60,38,15,.28);white-space:nowrap;display:flex;align-items:center;gap:12px;z-index:5}
+  .label .n{font-family:'Anton',sans-serif;font-weight:400;font-size:26px;letter-spacing:0;line-height:1;color:var(--stamp)}
+  .label::before{content:"";position:absolute;left:50%;top:-7px;width:44px;height:14px;margin-left:-22px;
+    background:rgba(236,220,178,.55);box-shadow:0 1px 2px rgba(60,38,15,.15)}
+  .stamp{position:absolute;font-family:'Big Shoulders Display',sans-serif;font-weight:900;text-transform:uppercase;
+    border:6px solid currentColor;border-radius:8px;mix-blend-mode:multiply;opacity:.9;line-height:1;
+    padding:8px 16px 6px;white-space:nowrap}
+
+  .arrow{position:absolute;width:64px;height:40px;color:var(--ink)}
+
+  /* ---------- phones ---------- */
+  .phone{position:absolute;top:104px;width:354px;height:670px;background:#fff;border:12px solid #1f1d1a;border-radius:44px;
+    overflow:hidden;display:flex;flex-direction:column;filter:drop-shadow(0 22px 26px rgba(60,38,15,.35));
+    font-family:'DM Sans',sans-serif;color:var(--app-ink);font-size:15px}
+  .status{height:34px;display:flex;justify-content:space-between;align-items:center;padding:4px 22px 0;font-size:13px;font-weight:700}
+  .status .notch{width:92px;height:22px;background:#1f1d1a;border-radius:0 0 14px 14px;position:absolute;left:50%;top:0;margin-left:-46px}
+  .status .ico{display:flex;gap:5px;align-items:center}
+  .status .ico i{display:block;background:var(--app-ink);border-radius:2px}
+  .bar{padding:10px 18px 12px;border-bottom:1px solid var(--line);font-weight:800;font-size:17px;display:flex;justify-content:space-between;align-items:center}
+  .bar small{font-weight:500;color:var(--muted);font-size:13px}
+  .screen{padding:16px;flex:1;display:flex;flex-direction:column}
+
+  .badge{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;border-radius:6px;padding:3px 8px;line-height:1.3}
+  .badge.vw{background:var(--vw-bg);color:var(--vw-fg)}
+  .order{border:1px solid var(--line);border-radius:12px;padding:12px;display:flex;gap:12px;align-items:center}
+  .mini{width:64px;height:64px;border-radius:10px;background:#efe6da;color:#8a6a4a;display:flex;align-items:center;justify-content:center;flex:none}
+  .mini svg{width:78%;height:60%}
+  .order b{font-size:16px}
+  .meta{color:var(--muted);font-size:13px;margin-top:2px}
+  .ok{color:var(--good);font-weight:700;font-size:13px;margin-top:3px}
+  .kv{display:flex;justify-content:space-between;font-size:13px;padding:9px 2px;border-bottom:1px solid var(--line);color:var(--muted)}
+  .kv span:last-child{color:var(--app-ink);font-weight:600}
+
+  .prompt{margin-top:auto;border-radius:16px;background:#fbf6ea;padding:16px;box-shadow:0 8px 22px rgba(0,0,0,.08)}
+  .prompt h4{font-size:18px;font-weight:800}
+  .prompt p{color:var(--muted);font-size:13px;margin-top:3px}
+  .btn{display:block;width:100%;text-align:center;background:var(--accent);color:#fff;border-radius:12px;padding:13px;font-weight:700;font-size:15px;margin-top:10px}
+  .btn.ghost{background:#fff;color:var(--app-ink);border:1.5px solid var(--line)}
+  .btn.warn{background:#fff;color:var(--err);border:1.5px solid var(--err)}
+  .tap{position:relative}
+  .btn.tap{text-align:center}
+  .tap::after{content:"";position:absolute;left:24px;top:50%;width:30px;height:30px;margin-top:-15px;border-radius:50%;
+    background:rgba(185,28,28,.18);box-shadow:0 0 0 7px rgba(185,28,28,.08)}
+
+  label.h{display:block;font-size:12px;font-weight:700;color:var(--muted);margin:16px 0 6px;text-transform:uppercase;letter-spacing:.05em}
+  label.h .req{color:var(--err)}
+  .opts{border:1.5px solid var(--line);border-radius:12px;overflow:hidden}
+  .opt{display:flex;gap:10px;align-items:flex-start;padding:11px 12px;border-bottom:1px solid var(--line)}
+  .opt:last-child{border-bottom:none}
+  .opt.sel{background:var(--good-soft)}
+  .opt b{font-size:15px}
+  .opt small{display:block;color:var(--muted);font-size:12px;margin-top:1px}
+  .radio{width:18px;height:18px;border-radius:50%;border:1.5px solid #a39c90;flex:none;margin-top:2px}
+  .radio.on{border:5px solid var(--accent)}
+  .note{border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;height:70px;font-size:14px;color:var(--app-ink);line-height:1.35}
+  .note .cursor{display:inline-block;width:1.5px;height:15px;background:var(--accent);vertical-align:-2px}
+  .hint{font-size:12px;color:var(--muted);margin-top:8px;text-align:center}
+
+  .done{display:flex;flex-direction:column;align-items:center;text-align:center;padding-top:26px}
+  .check{width:84px;height:84px;border-radius:50%;background:var(--good-soft);display:flex;align-items:center;justify-content:center}
+  .done h3{font-size:24px;font-weight:800;margin-top:16px}
+  .done p{color:var(--muted);font-size:14px;margin-top:6px;line-height:1.4}
+  .sum{border:1px solid var(--line);border-radius:12px;padding:4px 14px;margin-top:22px;text-align:left}
+  .next{margin-top:14px;background:#f6f4ef;border-radius:12px;padding:12px 14px;font-size:13px;color:var(--muted);line-height:1.45}
+  .next b{color:var(--app-ink)}
+
+  /* ---------- north star ticket ---------- */
+  .ticket{position:absolute;left:1352px;top:250px;width:318px;background:var(--manila);padding:26px 22px 22px;
+    transform:rotate(2deg);box-shadow:0 10px 18px rgba(60,38,15,.3);font-family:'Courier Prime',monospace;color:var(--ink)}
+  .ticket .hole{position:absolute;left:50%;top:12px;width:16px;height:16px;margin-left:-8px;border-radius:50%;background:var(--kraft);box-shadow:inset 0 2px 3px rgba(0,0,0,.25)}
+  .ticket .row{display:flex;justify-content:space-between;font-size:17px;padding:5px 0;border-bottom:1.5px dashed rgba(38,34,31,.35)}
+  .ticket .row b{font-weight:700}
+  .ticket .ttl{font-family:'Anton',sans-serif;font-size:30px;letter-spacing:.02em;text-transform:uppercase;line-height:1;margin-top:12px}
+  .ticket .cap{font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-size:15px;color:var(--ink-soft);margin-top:18px}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="sofa" viewBox="0 0 120 70">
+    <rect x="14" y="8" width="92" height="32" rx="8" fill="currentColor" opacity=".85"/>
+    <rect x="4" y="26" width="22" height="32" rx="7" fill="currentColor"/>
+    <rect x="94" y="26" width="22" height="32" rx="7" fill="currentColor"/>
+    <rect x="20" y="36" width="80" height="20" rx="5" fill="currentColor" opacity=".95"/>
+    <rect x="12" y="58" width="6" height="8" rx="2" fill="#3b3328"/>
+    <rect x="102" y="58" width="6" height="8" rx="2" fill="#3b3328"/>
+  </symbol>
+  <symbol id="arr" viewBox="0 0 64 40">
+    <path d="M4 22 C 18 14, 34 26, 52 19" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+    <path d="M42 9 L 56 18 L 44 30" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+</svg>
+
+<!-- ===== Annotations ===== -->
+<div class="label" style="left:50px;top:28px;transform:rotate(-2deg)"><span class="n">1</span>Completed orders only</div>
+<div class="label" style="left:520px;top:30px;transform:rotate(1.5deg)"><span class="n">2</span>Reason required</div>
+<div class="label" style="left:960px;top:26px;transform:rotate(-1.5deg)"><span class="n">3</span>Two taps, done</div>
+
+<!-- ===== Arrows ===== -->
+<svg class="arrow" style="left:410px;top:420px"><use href="#arr"/></svg>
+<svg class="arrow" style="left:856px;top:420px"><use href="#arr"/></svg>
+<svg class="arrow" style="left:1290px;top:420px;color:var(--green)"><use href="#arr"/></svg>
+
+<!-- ===== Phone 1: completed order ===== -->
+<div class="phone" style="left:44px">
+  <div class="status"><span>9:41</span><span class="notch"></span><span class="ico"><i style="width:16px;height:9px"></i><i style="width:22px;height:11px;border-radius:3px"></i></span></div>
+  <div class="bar">Order #4821 <small>Done</small></div>
+  <div class="screen">
+    <div class="order">
+      <div class="mini"><svg><use href="#sofa"/></svg></div>
+      <div>
+        <b>Grey 3-seat sofa</b>
+        <div class="meta">$180 · Picked up</div>
+        <div class="ok">✓ Completed</div>
+      </div>
+    </div>
+    <div style="margin-top:8px">
+      <div class="kv"><span>Condition listed</span><span class="badge vw">◐ Visible wear</span></div>
+      <div class="kv"><span>Seller</span><span>Marco R.</span></div>
+      <div class="kv"><span>Picked up</span><span>Today, 11:20</span></div>
+      <div class="kv"><span>Paid</span><span>$180 · in person</span></div>
+    </div>
+    <div class="prompt">
+      <h4>Did it match the listing?</h4>
+      <p>You can report within 48h of pickup.</p>
+      <div class="btn ghost">Yes, as described</div>
+      <div class="btn warn tap">⚑ Doesn't match description</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Phone 2: pick a reason ===== -->
+<div class="phone" style="left:490px">
+  <div class="status"><span>9:41</span><span class="notch"></span><span class="ico"><i style="width:16px;height:9px"></i><i style="width:22px;height:11px;border-radius:3px"></i></span></div>
+  <div class="bar">← Report an issue <small>1 of 1</small></div>
+  <div class="screen">
+    <div class="order" style="padding:9px">
+      <div class="mini" style="width:46px;height:46px"><svg><use href="#sofa"/></svg></div>
+      <div><b style="font-size:15px">Grey 3-seat sofa</b><div class="meta">Order #4821 · $180</div></div>
+    </div>
+    <label class="h">What was different? <span class="req">* required</span></label>
+    <div class="opts">
+      <div class="opt sel"><span class="radio on"></span><div><b>Condition worse than described</b><small>More wear or damage than the badge</small></div></div>
+      <div class="opt"><span class="radio"></span><div><b>Wrong item</b><small>Not the item in the photos</small></div></div>
+      <div class="opt"><span class="radio"></span><div><b>Missing parts</b><small>Cushions, legs or pieces absent</small></div></div>
+    </div>
+    <label class="h">Note <span style="text-transform:none;font-weight:500">(optional)</span></label>
+    <div class="note">Left armrest is torn, not just scuffed<span class="cursor"></span></div>
+    <div class="btn" style="margin-top:auto">Submit report</div>
+    <div class="hint">Submit stays locked until a reason is picked</div>
+  </div>
+</div>
+
+<!-- ===== Phone 3: confirmation ===== -->
+<div class="phone" style="left:936px">
+  <div class="status"><span>9:42</span><span class="notch"></span><span class="ico"><i style="width:16px;height:9px"></i><i style="width:22px;height:11px;border-radius:3px"></i></span></div>
+  <div class="bar">Report filed <small>Close</small></div>
+  <div class="screen">
+    <div class="done">
+      <div class="check"><svg width="44" height="44" viewBox="0 0 44 44"><path d="M10 23 L19 32 L35 13" fill="none" stroke="#15803d" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <h3>Report filed</h3>
+      <p>Logged against order #4821.<br>Thanks, this helps keep listings honest.</p>
+    </div>
+    <div class="sum">
+      <div class="kv"><span>Reason</span><span>Condition worse</span></div>
+      <div class="kv"><span>Note</span><span>Armrest torn</span></div>
+      <div class="kv" style="border-bottom:none"><span>Report ID</span><span>R-1093</span></div>
+    </div>
+    <div class="next"><b>What happens next:</b> our team reviews it before anything affects the seller. You'll hear back within 2 days.</div>
+    <div class="btn ghost" style="margin-top:auto">Back to orders</div>
+  </div>
+</div>
+
+<!-- ===== North Star ticket ===== -->
+<div class="stamp" style="left:1346px;top:136px;color:var(--stamp);font-size:31px;transform:rotate(-4deg)">→ North Star · ≤24h</div>
+<div class="ticket">
+  <span class="hole"></span>
+  <div class="row"><span>REPORT</span><b>R-1093</b></div>
+  <div class="row"><span>ORDER</span><b>#4821</b></div>
+  <div class="row"><span>REASON</span><b>CONDITION</b></div>
+  <div class="cap">Clean purchases / week</div>
+  <svg width="274" height="150" viewBox="0 0 274 150" style="display:block;margin-top:10px">
+    <line x1="0" y1="130" x2="274" y2="130" stroke="#26221f" stroke-width="2"/>
+    <rect x="10"  y="70" width="42" height="60" fill="#2f5d50" opacity=".55"/>
+    <rect x="76"  y="58" width="42" height="72" fill="#2f5d50" opacity=".7"/>
+    <rect x="142" y="44" width="42" height="86" fill="#2f5d50" opacity=".85"/>
+    <rect x="208" y="30" width="42" height="100" fill="#2f5d50"/>
+    <rect x="208" y="18" width="42" height="12" fill="#d8431e"/>
+    <text x="229" y="12" text-anchor="middle" font-family="Courier Prime" font-weight="700" font-size="14" fill="#d8431e">−1</text>
+    <text x="31"  y="147" text-anchor="middle" font-family="Courier Prime" font-size="13" fill="#26221f">W1</text>
+    <text x="97"  y="147" text-anchor="middle" font-family="Courier Prime" font-size="13" fill="#26221f">W2</text>
+    <text x="163" y="147" text-anchor="middle" font-family="Courier Prime" font-size="13" fill="#26221f">W3</text>
+    <text x="229" y="147" text-anchor="middle" font-family="Courier Prime" font-weight="700" font-size="13" fill="#26221f">W4</text>
+  </svg>
+  <div class="ttl" style="font-size:24px;margin-top:10px">Mismatch = data</div>
+</div>
+<div class="stamp" style="left:1400px;top:680px;color:var(--green);font-size:30px;transform:rotate(3deg)">No manual pull</div>
+</body>
+</html>
